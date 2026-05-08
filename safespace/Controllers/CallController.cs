@@ -395,6 +395,7 @@ namespace safespace.Controllers
         }
 
         //  إنهاء المكالمة (للدكتور فقط)
+        // 🟢 4) End Call
         [HttpPost("end/{callId}")]
         public async Task<IActionResult> EndCall(int callId)
         {
@@ -404,18 +405,28 @@ namespace safespace.Controllers
                 .Include(c => c.Session)
                 .FirstOrDefaultAsync(c => c.Id == callId);
 
-            if (call == null) return NotFound("Call not found");
+            if (call == null)
+                return NotFound("Call not found");
 
-            // الدكتور هو اللي بيقفل السيشن
             if (call.Session.DoctorId != userId)
-                return Unauthorized("Only doctors can end the session");
+                return Unauthorized("Only doctor can end");
 
+            // تحديث حالة المكالمة
             call.Status = "Ended";
             call.IsStarted = false;
 
+            // 👈 السطر الجديد: تحديث حالة الجلسة الأصلية لـ Completed
+            if (call.Session != null)
+            {
+                call.Session.Status = "Completed";
+            }
+
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Call has ended successfully" });
+            return Ok(new
+            {
+                message = "Call ended and session marked as completed"
+            });
         }
 
         //  جلب بيانات المكالمة (لو احتاجوا يعرضوا مين موجود دلوقتي)

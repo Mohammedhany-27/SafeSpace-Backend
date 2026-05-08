@@ -32,44 +32,34 @@ namespace safespace.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterPatient([FromBody] RegisterPatientDto model)
         {
-            Console.WriteLine("REGISTER HIT");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (_context.PatientProfile.Any(p => p.Email == model.Email))
-                return BadRequest("Email already exists");
-
-            if (model.Password != model.ConfirmPassword)
-                return BadRequest("Passwords do not match");
+            // ... (سيب الـ checks اللي في الأول زي ما هي) ...
 
             var token = Guid.NewGuid().ToString();
             var hasher = new PasswordHasher<PatientProfile>();
 
+            // توليد الكود العشوائي
+            var random = new Random();
+            var generatedCode = $"usr-{random.Next(10000, 99999)}";
 
             var patient = new PatientProfile
             {
                 FullName = model.FullName,
                 DisplayName = model.DisplayName,
                 Email = model.Email,
-                //PasswordHash = model.Password,
                 Age = model.Age,
                 Gender = model.Gender,
                 EmailVerificationToken = token,
                 TokenExpiry = DateTime.UtcNow.AddHours(24),
                 IsEmailVerified = false,
+                PasswordHash = hasher.HashPassword(null, model.Password),
 
-                PasswordHash = hasher.HashPassword(null, model.Password)
+                usercode = generatedCode // بنحفظ الكود هنا
             };
-
-            //var hasher = new PasswordHasher<PatientProfile>();
-            //patient.PasswordHash = hasher.HashPassword(patient, model.Password);
 
             _context.PatientProfile.Add(patient);
             await _context.SaveChangesAsync();
 
-            var verificationLink =$"{Request.Scheme}://{Request.Host}/api/auth/verify-email?token={token}";
-            //Console.WriteLine(token);
-            //Console.WriteLine(verificationLink);
+            var verificationLink = $"{Request.Scheme}://{Request.Host}/api/auth/verify-email?token={token}";
             _emailService.SendVerificationEmail(model.Email, verificationLink);
 
             return Ok("Account created. Please verify your email.");

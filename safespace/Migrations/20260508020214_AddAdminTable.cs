@@ -16,26 +16,9 @@ namespace safespace.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "Email",
-                table: "Doctor",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+           
 
-            migrationBuilder.AddColumn<bool>(
-                name: "IsActive",
-                table: "Doctor",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
-
-            migrationBuilder.AddColumn<string>(
-                name: "PasswordHash",
-                table: "Doctor",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+           
 
             migrationBuilder.CreateTable(
                 name: "Admins",

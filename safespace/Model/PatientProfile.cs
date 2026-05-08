@@ -9,6 +9,8 @@ namespace safespace.Model
         [Required]
         public string DisplayName { get; set; } = "";
 
+        public string usercode { get; set; } = "";
+
         /*public int UserId { get; set; }
         public User User { get; set; } = null!;
         */
