@@ -1,0 +1,6 @@
+@safespace_HostAddress = http://localhost:5117
+
+GET {{safespace_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
